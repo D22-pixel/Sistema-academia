@@ -23,238 +23,173 @@ import javax.swing.SwingConstants;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 /**
  *
  * @author denis
  */
-public class TelaMatriculas extends JFrame{
-    private JComboBox<Alunos> comboAlunos;
-    private JComboBox<Planos> comboPlanos;
-    private JComboBox<String> comboStatus;
-    private JButton btnMatricular, btnVoltar;
-    private JTextArea txtResumo;
-    
-    public TelaMatriculas() {
-        setTitle("Nova Matrícula");
-        setSize(700, 500);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
-        inicializarComponentes();
-    }
-    
-    private void inicializarComponentes() {
-        txtResumo = new JTextArea(8, 40);
-        txtResumo.setEditable(false);
-        txtResumo.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        txtResumo.setBackground(new Color(245, 245, 245));
-        
-        JPanel painelPrincipal = new JPanel(new BorderLayout(10, 10));
-        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        painelPrincipal.setBackground(Color.white);
- 
-        JLabel lblTitulo = new JLabel("NOVA MATRÍCULA", SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
-        lblTitulo.setForeground(new Color(0, 10, 10));
-        lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+public class TelaMatriculas extends TelaBase {
 
-        JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(Color.white);
-        painelForm.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(0, 10, 10), 2),
-            "Dados da Matrícula",
-            javax.swing.border.TitledBorder.LEFT,
-            javax.swing.border.TitledBorder.TOP,
-            new Font("Arial", Font.BOLD, 14),
-            new Color(0, 10,10)
-        ));
-        
+    private JComboBox<Alunos>  comboAlunos;
+    private JComboBox<Planos>  comboPlanos;
+    private JComboBox<String>  comboStatus;
+    private JTextArea          txtResumo;
+
+    public TelaMatriculas() {
+        super("Nova Matrícula");
+        setSize(760, 580);
+        setLocationRelativeTo(null);
+        inicializarUI();
+    }
+
+    private void inicializarUI() {
+        txtResumo = new JTextArea(9, 40);
+        txtResumo.setEditable(false);
+        txtResumo.setBackground(COR_BG_CARD);
+        txtResumo.setForeground(COR_TEXTO);
+        txtResumo.setFont(new Font("Consolas", Font.PLAIN, 12));
+        txtResumo.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+
+        JPanel root = new JPanel(new BorderLayout(14, 14));
+        root.setBackground(COR_BG_MAIN);
+        root.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JPanel topo = new JPanel(new BorderLayout(0, 4));
+        topo.setOpaque(false);
+        topo.add(criarTituloPagina("✅  Nova Matrícula"), BorderLayout.NORTH);
+        topo.add(criarSubtitulo("Vincule um aluno a um plano de mensalidade"), BorderLayout.SOUTH);
+        root.add(topo, BorderLayout.NORTH);
+
+        JPanel cardForm = criarCard("Dados da Matrícula");
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        JLabel lblAluno = new JLabel("Selecione o Aluno:");
-        lblAluno.setFont(new Font("Arial", Font.BOLD, 14));
-        painelForm.add(lblAluno, gbc);
-        
         comboAlunos = new JComboBox<>();
-        comboAlunos.setFont(new Font("Arial", Font.PLAIN, 12));
+        estilizarCombo(comboAlunos);
         carregarAlunos();
-        gbc.gridx = 1; gbc.gridy = 0;
-        painelForm.add(comboAlunos, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        JLabel lblPlano = new JLabel("Selecione o Plano:");
-        lblPlano.setFont(new Font("Arial", Font.BOLD, 14));
-        painelForm.add(lblPlano, gbc);
-        
         comboPlanos = new JComboBox<>();
-        comboPlanos.setFont(new Font("Arial", Font.PLAIN, 12));
+        estilizarCombo(comboPlanos);
         comboPlanos.addActionListener(e -> atualizarResumo());
         carregarPlanos();
-        gbc.gridx = 1; gbc.gridy = 1;
-        painelForm.add(comboPlanos, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        JLabel lblStatus = new JLabel("Status do Pagamento:");
-        lblStatus.setFont(new Font("Arial", Font.BOLD, 14));
-        painelForm.add(lblStatus, gbc);
-        
         String[] status = {"Ativa", "Pendente", "Cancelada"};
         comboStatus = new JComboBox<>(status);
-        comboStatus.setFont(new Font("Arial", Font.PLAIN, 12));
-        gbc.gridx = 1; gbc.gridy = 2;
-        painelForm.add(comboStatus, gbc);
+        estilizarCombo(comboStatus);
 
-        JPanel painelResumo = new JPanel(new BorderLayout());
-        painelResumo.setBackground(Color.white);
-        painelResumo.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(0, 10, 10), 2),
-            "Resumo da Matrícula",
-            javax.swing.border.TitledBorder.LEFT,
-            javax.swing.border.TitledBorder.TOP,
-            new Font("Arial", Font.BOLD, 14),
-            new Color(0, 10, 10)
-        ));
-        
-        JScrollPane scrollResumo = new JScrollPane(txtResumo);
-        painelResumo.add(scrollResumo, BorderLayout.CENTER);
- 
-        JPanel painelCentral = new JPanel(new BorderLayout(10, 10));
-        painelCentral.setBackground(Color.white);
-        painelCentral.add(painelForm, BorderLayout.NORTH);
-        painelCentral.add(painelResumo, BorderLayout.CENTER);
-        
-        painelPrincipal.add(painelCentral, BorderLayout.CENTER);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        form.add(criarLabel("Aluno:"), gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        form.add(comboAlunos, gbc);
 
-        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        painelBotoes.setBackground(Color.white);
-        
-        btnMatricular = new JButton("Confirmar Matrícula");
-        btnMatricular.setBackground(new Color(0, 10, 10));
-        btnMatricular.setForeground(Color.black);
-        btnMatricular.setFont(new Font("Arial", Font.BOLD, 14));
-        btnMatricular.setFocusPainted(false);
-        btnMatricular.setPreferredSize(new Dimension(200, 40));
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
+        form.add(criarLabel("Plano:"), gbc);
+        gbc.gridx = 1; gbc.gridwidth = 2;
+        form.add(comboPlanos, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
+        form.add(criarLabel("Status:"), gbc);
+        gbc.gridx = 1; gbc.gridwidth = 1;
+        form.add(comboStatus, gbc);
+
+        cardForm.add(form, BorderLayout.CENTER);
+
+        JPanel cardResumo = criarCard("Resumo da Matrícula");
+        JScrollPane sc = new JScrollPane(txtResumo);
+        sc.setBackground(COR_BG_CARD);
+        sc.getViewport().setBackground(COR_BG_CARD);
+        sc.setBorder(BorderFactory.createLineBorder(COR_BORDER, 1));
+        cardResumo.add(sc, BorderLayout.CENTER);
+
+        JPanel centro = new JPanel(new BorderLayout(0, 14));
+        centro.setOpaque(false);
+        centro.add(cardForm,   BorderLayout.NORTH);
+        centro.add(cardResumo, BorderLayout.CENTER);
+
+        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rodape.setOpaque(false);
+        JButton btnMatricular = criarBotaoPrimario("✔  Confirmar Matrícula");
         btnMatricular.addActionListener(e -> realizarMatricula());
-        
-        btnVoltar = new JButton("Voltar ao Menu");
-        btnVoltar.setBackground(new Color(0, 10, 10));
-        btnVoltar.setForeground(Color.black);
-        btnVoltar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVoltar.setFocusPainted(false);
-        btnVoltar.setPreferredSize(new Dimension(200, 40));
+        JButton btnVoltar = criarBotaoSecundario("← Voltar");
         btnVoltar.addActionListener(e -> dispose());
-        
-        painelBotoes.add(btnMatricular);
-        painelBotoes.add(btnVoltar);
-        
-        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
-        
-        add(painelPrincipal);
-        
+        rodape.add(btnMatricular);
+        rodape.add(btnVoltar);
+
+        root.add(centro, BorderLayout.CENTER);
+        root.add(rodape, BorderLayout.SOUTH);
+
+        painelConteudo.removeAll();
+        painelConteudo.add(root, BorderLayout.CENTER);
+        painelConteudo.revalidate();
         atualizarResumo();
     }
-    
+
     private void carregarAlunos() {
-        comboAlunos.removeAllItems();
-        List<Alunos> alunos = DadosSistema.getInstancia().getAlunos();
-        
-        if (alunos.isEmpty()) {
+        List<Alunos> lista = new AlunosDAO().listarTodos();
+        if (lista == null || lista.isEmpty()) {
             comboAlunos.addItem(null);
-            JOptionPane.showMessageDialog(this,
-                "Não há alunos cadastrados!\nCadastre alunos primeiro.",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Não há alunos cadastrados!");
         } else {
-            for (Alunos aluno : alunos) {
-                comboAlunos.addItem(aluno);
-            }
+            for (Alunos a : lista) comboAlunos.addItem(a);
         }
     }
-    
+
     private void carregarPlanos() {
         comboPlanos.removeAllItems();
-        List<Planos> planos = DadosSistema.getInstancia().getPlanos();
-        
-        if (planos.isEmpty()) {
-            comboPlanos.addItem(null);
-            JOptionPane.showMessageDialog(this,
-                "Não há planos cadastrados!\nCadastre planos primeiro.",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE);
-        } else {
-            for (Planos plano : planos) {
-                comboPlanos.addItem(plano);
+        List<Planos> lista = new PlanosDAO().listarTodos();
+        if (lista.isEmpty()) comboPlanos.addItem(null);
+        else for (Planos p : lista) comboPlanos.addItem(p);
+    }
+
+    private void atualizarResumo() {
+        Alunos a = (Alunos) comboAlunos.getSelectedItem();
+        Planos p = (Planos) comboPlanos.getSelectedItem();
+        if (a == null || p == null) { txtResumo.setText("Selecione um aluno e um plano."); return; }
+        StringBuilder sb = new StringBuilder();
+        sb.append("─".repeat(48)).append("\n");
+        sb.append("         RESUMO DA MATRÍCULA\n");
+        sb.append("─".repeat(48)).append("\n\n");
+        sb.append("ALUNO\n  Nome:     ").append(a.getNome()).append("\n");
+        sb.append("  CPF:      ").append(a.getCPF()).append("\n");
+        if (a.getTelefone() != null) sb.append("  Telefone: ").append(a.getTelefone()).append("\n");
+        sb.append("\nPLANO\n  ").append(p.getNomePlano()).append("\n");
+        if (p.getDescricao() != null) sb.append("  ").append(p.getDescricao()).append("\n");
+        sb.append("  Duração: ").append(p.getDuracaoDias()).append(" dias\n");
+        sb.append("\nVALOR   R$ ").append(String.format("%.2f", p.getValor())).append("\n");
+        sb.append("\n").append("─".repeat(48)).append("\n");
+        txtResumo.setText(sb.toString());
+    }
+
+    private void realizarMatricula() {
+        Alunos a = (Alunos) comboAlunos.getSelectedItem();
+        Planos p = (Planos) comboPlanos.getSelectedItem();
+        String status = (String) comboStatus.getSelectedItem();
+        if (a == null || p == null) {
+            JOptionPane.showMessageDialog(this, "Selecione aluno e plano!"); return;
+        }
+        for (Matriculas m : DadosSistema.getInstancia().getMatriculasPorAluno(a)) {
+            if ("Ativa".equals(m.getStatusPagamento())) {
+                int op = JOptionPane.showConfirmDialog(this,
+                        "Aluno já possui matrícula ativa!\nCancelar atual e criar nova?",
+                        "Aviso", JOptionPane.YES_NO_OPTION);
+                if (op == JOptionPane.YES_OPTION) m.setStatusPagamento("Cancelada");
+                else return;
             }
         }
-    }
-    
-    private void atualizarResumo() {
-        Alunos alunoSelecionado = (Alunos) comboAlunos.getSelectedItem();
-        Planos planoSelecionado = (Planos) comboPlanos.getSelectedItem();
-        
-        if (alunoSelecionado == null || planoSelecionado == null) {
-            txtResumo.setText("Selecione um aluno e um plano para ver o resumo.");
-            return;
-        }
-        
-        StringBuilder resumo = new StringBuilder();
-        resumo.append("=".repeat(50)).append("\n");
-        resumo.append("           RESUMO DA MATRÍCULA\n");
-        resumo.append("=".repeat(50)).append("\n\n");
-        
-        resumo.append("ALUNO:\n");
-        resumo.append("  Nome: ").append(alunoSelecionado.getNome()).append("\n");
-        resumo.append("  CPF: ").append(alunoSelecionado.getCPF()).append("\n");
-        if (alunoSelecionado.getTelefone() != null) {
-            resumo.append("  Telefone: ").append(alunoSelecionado.getTelefone()).append("\n");
-        }
-        
-        resumo.append("\nPLANO SELECIONADO:\n");
-        resumo.append("  ").append(planoSelecionado.getNomePlano()).append("\n");
-        if (planoSelecionado.getDescricao() != null) {
-            resumo.append("  ").append(planoSelecionado.getDescricao()).append("\n");
-        }
-        resumo.append("  Duração: ").append(planoSelecionado.getDuracaoDias()).append(" dias\n");
-        
-        resumo.append("\nVALOR:\n");
-        resumo.append("  R$ ").append(String.format("%.2f", planoSelecionado.getValor())).append("\n");
-        
-        resumo.append("\n").append("=".repeat(50)).append("\n");
-        
-        txtResumo.setText(resumo.toString());
-    }
-    
-    private void realizarMatricula() {
-        Alunos alunoSelecionado = (Alunos) comboAlunos.getSelectedItem();
-        Planos planoSelecionado = (Planos) comboPlanos.getSelectedItem();
-        String status = (String) comboStatus.getSelectedItem();
-        
-        if (alunoSelecionado == null || planoSelecionado == null) {
+        Matriculas nova = new Matriculas(a, p, status);
+        MatriculasDAO dao = new MatriculasDAO();
+        if (dao.salvar(nova)) {
+            DadosSistema.getInstancia().adicionarMatricula(nova);
             JOptionPane.showMessageDialog(this,
-                "Selecione um aluno e um plano!",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE);
-            return;
+                    "Matrícula realizada!\n\nAluno: " + a.getNome()
+                    + "\nPlano: " + p.getNomePlano()
+                    + "\nValor: R$ " + String.format("%.2f", p.getValor()),
+                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar matrícula!", "Erro", JOptionPane.ERROR_MESSAGE);
         }
-        
-        Matriculas novaMatricula = new Matriculas(alunoSelecionado, planoSelecionado, status);
-        DadosSistema.getInstancia().adicionarMatricula(novaMatricula);
-        
-        JOptionPane.showMessageDialog(this,
-            "Matrícula realizada com sucesso!\n\n" +
-            "Aluno: " + alunoSelecionado.getNome() + "\n" +
-            "Plano: " + planoSelecionado.getNomePlano() + "\n" +
-            "Valor: R$ " + String.format("%.2f", planoSelecionado.getValor()) + "\n" +
-            "Data de início: " + novaMatricula.getDataInicio() + "\n" +
-            "Data de término: " + novaMatricula.getDataFim(),
-            "Matrícula Confirmada",
-            JOptionPane.INFORMATION_MESSAGE);
-        
-        dispose();
     }
 }

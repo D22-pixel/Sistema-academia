@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -26,221 +27,160 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 
-public class TelaGerenciarPlanos extends JFrame {
+public class TelaGerenciarPlanos extends TelaBase {
     private JTextField txtNomePlano, txtValor, txtDuracao;
     private JTextArea txtDescricao;
-    private JButton btnSalvar, btnLimpar, btnVoltar;
+    private JButton btnSalvar, btnLimpar, btnExcluir;
     private JTable tabelaPlanos;
     private DefaultTableModel modeloTabela;
-    
+
     public TelaGerenciarPlanos() {
-        setTitle("Gerenciar Planos");
-        setSize(900, 600);
+        super("Gerenciar Planos");
+        setSize(1060, 780);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
-        inicializarComponentes();
+        inicializarUI();
         carregarPlanos();
     }
-    
-    private void inicializarComponentes() {
-        JPanel painelPrincipal = new JPanel(new BorderLayout(10, 10));
-        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        painelPrincipal.setBackground(Color.white);
 
-        JLabel lblTitulo = new JLabel("GERENCIAMENTO DE PLANOS", SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
-        lblTitulo.setForeground(new Color(0,10 ,10));
-        lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+    private void inicializarUI() {
+        JPanel root = new JPanel(new BorderLayout(14, 14));
+        root.setBackground(COR_BG_MAIN);
+        root.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
-        JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(Color.white);
-        painelForm.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(0, 10, 10), 2),
-            "Dados do Plano",
-            javax.swing.border.TitledBorder.LEFT,
-            javax.swing.border.TitledBorder.TOP,
-            new Font("Arial", Font.BOLD, 14),
-            new Color(0, 10, 10)
-        ));
-        
+        JPanel topo = new JPanel(new BorderLayout(0, 4));
+        topo.setOpaque(false);
+        topo.add(criarTituloPagina("📋  Gerenciamento de Planos"), BorderLayout.NORTH);
+        topo.add(criarSubtitulo("Cadastrar e gerenciar planos de mensalidade"), BorderLayout.SOUTH);
+        root.add(topo, BorderLayout.NORTH);
+
+        JPanel cardForm = criarCard("Dados do Plano");
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(7, 8, 7, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        painelForm.add(new JLabel("Nome do Plano:"), gbc);
-        
-        txtNomePlano = new JTextField(25);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 2;
-        painelForm.add(txtNomePlano, gbc);
-  
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
-        painelForm.add(new JLabel("Valor (R$):"), gbc);
-        
-        txtValor = new JTextField(15);
-        gbc.gridx = 1; gbc.gridy = 1;
-        painelForm.add(txtValor, gbc);
- 
-        gbc.gridx = 0; gbc.gridy = 2;
-        painelForm.add(new JLabel("Duração (dias):"), gbc);
-        
-        txtDuracao = new JTextField(15);
-        gbc.gridx = 1; gbc.gridy = 2;
-        painelForm.add(txtDuracao, gbc);
- 
-        gbc.gridx = 0; gbc.gridy = 3;
-        painelForm.add(new JLabel("Descrição:"), gbc);
-        
-        txtDescricao = new JTextArea(3, 25);
+        txtNomePlano = criarCampoTexto(26);
+        txtValor     = criarCampoTexto(14);
+        txtDuracao   = criarCampoTexto(14);
+        txtDescricao = new JTextArea(3, 26);
+        txtDescricao.setBackground(COR_BG_CARD);
+        txtDescricao.setForeground(COR_TEXTO);
+        txtDescricao.setCaretColor(COR_TEXTO);
+        txtDescricao.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         txtDescricao.setLineWrap(true);
         txtDescricao.setWrapStyleWord(true);
-        JScrollPane scrollDescricao = new JScrollPane(txtDescricao);
-        gbc.gridx = 1; gbc.gridy = 3; gbc.gridwidth = 2;
-        painelForm.add(scrollDescricao, gbc);
+        txtDescricao.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(COR_BORDER),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
-        JPanel painelBotoesForm = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        painelBotoesForm.setBackground(Color.white);
-        
-        btnSalvar = new JButton("Salvar Plano");
-        btnSalvar.setBackground(new Color(0,10,10));
-        btnSalvar.setForeground(Color.black);
-        btnSalvar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnSalvar.setFocusPainted(false);
+        addRow(form, gbc, 0, "Nome do Plano:", txtNomePlano, 3);
+        addRow(form, gbc, 1, "Valor (R$):",    txtValor,     3);
+        addRow(form, gbc, 2, "Duração (dias):",txtDuracao,   3);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
+        form.add(criarLabel("Descrição:"), gbc);
+        gbc.gridx = 1; gbc.gridwidth = 3;
+        form.add(new JScrollPane(txtDescricao), gbc);
+
+        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        btnRow.setOpaque(false);
+        btnSalvar  = criarBotaoPrimario("✔  Salvar Plano");
         btnSalvar.addActionListener(e -> salvarPlano());
-        
-        btnLimpar = new JButton("Limpar Campos");
-        btnLimpar.setBackground(new Color(0,10 , 10));
-        btnLimpar.setForeground(Color.black);
-        btnLimpar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnLimpar.setFocusPainted(false);
+        btnLimpar  = criarBotaoSecundario("✕  Limpar");
         btnLimpar.addActionListener(e -> limparCampos());
-        
-        painelBotoesForm.add(btnSalvar);
-        painelBotoesForm.add(btnLimpar);
-        
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 3;
-        painelForm.add(painelBotoesForm, gbc);
- 
-        JPanel painelTabela = new JPanel(new BorderLayout());
-        painelTabela.setBackground(Color.white);
-        painelTabela.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(0,10 ,10), 2),
-            "Planos Cadastrados",
-            javax.swing.border.TitledBorder.LEFT,
-            javax.swing.border.TitledBorder.TOP,
-            new Font("Arial", Font.BOLD, 14),
-            new Color(0,10 ,10)
-        ));
-        
-        String[] colunas = {"ID", "Nome do Plano", "Valor (R$)", "Duração (dias)", "Descrição"};
-        modeloTabela = new DefaultTableModel(colunas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+        btnExcluir = criarBotaoDanger("🗑  Excluir");
+        btnExcluir.addActionListener(e -> excluirPlano());
+        btnRow.add(btnSalvar); btnRow.add(btnLimpar); btnRow.add(btnExcluir);
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 4;
+        form.add(btnRow, gbc);
+        cardForm.add(form, BorderLayout.CENTER);
+
+        JPanel cardTab = criarCard("Planos Cadastrados");
+        String[] cols = {"ID", "Nome do Plano", "Valor (R$)", "Duração (dias)", "Descrição"};
+        modeloTabela = new DefaultTableModel(cols, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
         };
-        
         tabelaPlanos = new JTable(modeloTabela);
-        tabelaPlanos.setFont(new Font("Arial", Font.PLAIN, 12));
-        tabelaPlanos.setRowHeight(25);
-        tabelaPlanos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-        tabelaPlanos.getTableHeader().setBackground(new Color(0,10 ,10));
-        tabelaPlanos.getTableHeader().setForeground(Color.black);
-        
-        JScrollPane scrollPane = new JScrollPane(tabelaPlanos);
-        painelTabela.add(scrollPane, BorderLayout.CENTER);
+        estilizarTabela(tabelaPlanos);
+        cardTab.add(criarScrollEscuro(tabelaPlanos), BorderLayout.CENTER);
 
-        JPanel painelCentral = new JPanel(new BorderLayout(10, 10));
-        painelCentral.setBackground(Color.white);
-        painelCentral.add(painelForm, BorderLayout.NORTH);
-        painelCentral.add(painelTabela, BorderLayout.CENTER);
-        
-        painelPrincipal.add(painelCentral, BorderLayout.CENTER);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, cardForm, cardTab);
+        split.setDividerLocation(340);
+        split.setDividerSize(6);
+        split.setResizeWeight(0.4);
+        split.setOpaque(false);
+        split.setBorder(null);
 
-        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        painelBotoes.setBackground(Color.white);
-        
-        btnVoltar = new JButton("Voltar ao Menu");
-        btnVoltar.setBackground(new Color(108, 117, 125));
-        btnVoltar.setForeground(Color.black);
-        btnVoltar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnVoltar.setFocusPainted(false);
+        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rodape.setOpaque(false);
+        JButton btnVoltar = criarBotaoSecundario("← Voltar ao Menu");
         btnVoltar.addActionListener(e -> dispose());
-        
-        painelBotoes.add(btnVoltar);
-        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
-        
-        add(painelPrincipal);
+        rodape.add(btnVoltar);
+
+        root.add(split,  BorderLayout.CENTER);
+        root.add(rodape, BorderLayout.SOUTH);
+
+        painelConteudo.removeAll();
+        painelConteudo.add(root, BorderLayout.CENTER);
+        painelConteudo.revalidate();
     }
-    
+
+    private void addRow(JPanel f, GridBagConstraints g, int row,
+                        String lbl, JTextField tf, int span) {
+        g.gridx = 0; g.gridy = row; g.gridwidth = 1;
+        f.add(criarLabel(lbl), g);
+        g.gridx = 1; g.gridwidth = span;
+        f.add(tf, g);
+    }
+
     private void salvarPlano() {
-        String nome = txtNomePlano.getText().trim();
-        String valorStr = txtValor.getText().trim();
-        String duracaoStr = txtDuracao.getText().trim();
-        String descricao = txtDescricao.getText().trim();
-        
-        if (nome.isEmpty() || valorStr.isEmpty() || duracaoStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Preencha todos os campos obrigatórios!",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE);
-            return;
+        String nome  = txtNomePlano.getText().trim(),
+               valTx = txtValor.getText().trim(),
+               durTx = txtDuracao.getText().trim(),
+               desc  = txtDescricao.getText().trim();
+        if (nome.isEmpty() || valTx.isEmpty() || durTx.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos obrigatórios!"); return;
         }
-        
         try {
-            double valor = Double.parseDouble(valorStr);
-            int duracao = Integer.parseInt(duracaoStr);
-            
-            if (valor <= 0 || duracao <= 0) {
-                JOptionPane.showMessageDialog(this,
-                    "Valor e duração devem ser maiores que zero!",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            Planos novoPlano = new Planos(nome, descricao, valor, duracao);
-            DadosSistema.getInstancia().adicionarPlano(novoPlano);
-            
-            JOptionPane.showMessageDialog(this,
-                "Plano cadastrado com sucesso!",
-                "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            limparCampos();
-            carregarPlanos();
-            
+            double val = Double.parseDouble(valTx); int dur = Integer.parseInt(durTx);
+            if (val <= 0 || dur <= 0) { JOptionPane.showMessageDialog(this, "Valor e duração devem ser > 0!"); return; }
+            Planos p = new Planos(nome, desc, val, dur); p.setId(0);
+            new PlanosDAO().salvarOuAtualizar(p);
+            JOptionPane.showMessageDialog(this, "Plano cadastrado com sucesso!");
+            limparCampos(); atualizarTabela();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this,
-                "Valor e duração devem ser números válidos!",
-                "Erro",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Valor e duração devem ser numéricos!");
         }
     }
-    
-    private void limparCampos() {
-        txtNomePlano.setText("");
-        txtValor.setText("");
-        txtDuracao.setText("");
-        txtDescricao.setText("");
-        txtNomePlano.requestFocus();
+
+    private void excluirPlano() {
+        int row = tabelaPlanos.getSelectedRow();
+        if (row == -1) { JOptionPane.showMessageDialog(this, "Selecione um plano!"); return; }
+        if (JOptionPane.showConfirmDialog(this, "Excluir este plano?",
+                "Confirmar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            new PlanosDAO().excluir((int) tabelaPlanos.getValueAt(row, 0));
+            atualizarTabela();
+        }
     }
-    
+
+    private void limparCampos() {
+        txtNomePlano.setText(""); txtValor.setText(""); txtDuracao.setText(""); txtDescricao.setText("");
+    }
+
     private void carregarPlanos() {
         modeloTabela.setRowCount(0);
-        List<Planos> planos = DadosSistema.getInstancia().getPlanos();
-        
-        for (Planos plano : planos) {
-            Object[] linha = {
-                plano.getId(),
-                plano.getNomePlano(),
-                String.format("%.2f", plano.getValor()),
-                plano.getDuracaoDias(),
-                plano.getDescricao() != null ? plano.getDescricao() : "-"
-            };
-            modeloTabela.addRow(linha);
-        }
+        for (Planos p : DadosSistema.getInstancia().getPlanos())
+            modeloTabela.addRow(new Object[]{p.getId(), p.getNomePlano(),
+                    String.format("%.2f", p.getValor()), p.getDuracaoDias(),
+                    p.getDescricao() != null ? p.getDescricao() : "-"});
     }
-}
+
+    public void atualizarTabela() {
+        modeloTabela.setRowCount(0);
+        for (Planos p : new PlanosDAO().listarTodos())
+            modeloTabela.addRow(new Object[]{p.getId(), p.getNomePlano(),
+                    p.getValor(), p.getDuracaoDias(), p.getDescricao()});
+    }
+}    

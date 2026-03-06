@@ -4,7 +4,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,146 +26,115 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 public class TelaLogin extends JFrame {
-   private JTextField txtUsuario;
+
+    private JTextField txtUsuario;
     private JPasswordField txtSenha;
-    private JButton btnEntrar;
-    private JButton btnSair;
-    
+
     public TelaLogin() {
-        setTitle("Sistema de Academia - Login");
-        setSize(450, 300);
+        setTitle("Academia — Login");
+        setSize(440, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-        
+        getContentPane().setBackground(TelaBase.COR_BG_MAIN);
+        setLayout(new BorderLayout());
         inicializarComponentes();
     }
-    
+
     private void inicializarComponentes() {
 
-        JPanel painelPrincipal = new JPanel();
-        painelPrincipal.setLayout(new BorderLayout(10, 10));
-        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
-        painelPrincipal.setBackground(new Color(240, 240, 240));
-  
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.setBackground(new Color(0x0D0D0D));
+        header.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 2, 0, TelaBase.COR_ACCENT),
+                BorderFactory.createEmptyBorder(22, 0, 22, 0)));
+
+        JLabel lblIcone = new JLabel("⬡--⬡");
+        lblIcone.setFont(TelaBase.resolverFonteIcone(40));
+        lblIcone.setForeground(TelaBase.COR_ACCENT2);
+        lblIcone.setAlignmentX(CENTER_ALIGNMENT);
+
         JLabel lblTitulo = new JLabel("SISTEMA DE ACADEMIA", SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
-        lblTitulo.setForeground(new Color(50, 80, 204));
-        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setAlignmentX(CENTER_ALIGNMENT);
 
-        JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(new Color(240, 240, 240));
+        JLabel lblSub = new JLabel("Faça login para continuar", SwingConstants.CENTER);
+        lblSub.setFont(new Font("Arial", Font.PLAIN, 13));
+        lblSub.setForeground(TelaBase.COR_TEXTO_SEC);
+        lblSub.setAlignmentX(CENTER_ALIGNMENT);
+
+        header.add(lblIcone);
+        header.add(Box.createVerticalStrut(6));
+        header.add(lblTitulo);
+        header.add(Box.createVerticalStrut(4));
+        header.add(lblSub);
+        add(header, BorderLayout.NORTH);
+
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setBackground(TelaBase.COR_BG_MAIN);
+        form.setBorder(BorderFactory.createEmptyBorder(30, 44, 16, 44));
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(9, 6, 9, 6);
         gbc.fill = GridBagConstraints.HORIZONTAL;
- 
-        JLabel lblUsuario = new JLabel("Usuário:");
-        lblUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        painelForm.add(lblUsuario, gbc);
-        
-        txtUsuario = new JTextField(15);
-        txtUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
+        form.add(TelaBase.criarLabel("Usuário:"), gbc);
+        txtUsuario = TelaBase.criarCampoTexto(13);
         gbc.gridx = 1;
-        gbc.gridy = 0;
-        painelForm.add(txtUsuario, gbc);
-  
-        JLabel lblSenha = new JLabel("Senha:");
-        lblSenha.setFont(new Font("Arial", Font.PLAIN, 14));
+        form.add(txtUsuario, gbc);
+
         gbc.gridx = 0;
         gbc.gridy = 1;
-        painelForm.add(lblSenha, gbc);
-        
-        txtSenha = new JPasswordField(15);
-        txtSenha.setFont(new Font("Arial", Font.PLAIN, 14));
+        form.add(TelaBase.criarLabel("Senha:"), gbc);
+        txtSenha = new JPasswordField(13);
+        txtSenha.setBackground(TelaBase.COR_BG_CARD);
+        txtSenha.setForeground(TelaBase.COR_TEXTO);
+        txtSenha.setCaretColor(TelaBase.COR_TEXTO);
+        txtSenha.setFont(new Font("Arial", Font.PLAIN, 13));
+        txtSenha.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(TelaBase.COR_BORDER, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
         gbc.gridx = 1;
-        gbc.gridy = 1;
-        painelForm.add(txtSenha, gbc);
-        
-        painelPrincipal.add(painelForm, BorderLayout.CENTER);
-  
-        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        painelBotoes.setBackground(new Color(240, 240, 240));
-        
-        btnEntrar = new JButton("Entrar");
-        btnEntrar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnEntrar.setBackground(new Color(0, 10,10));
-        btnEntrar.setForeground(Color.black);
-        btnEntrar.setFocusPainted(false);
-        btnEntrar.setPreferredSize(new Dimension(120, 35));
+        form.add(txtSenha, gbc);
+        add(form, BorderLayout.CENTER);
+
+        JPanel painelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 18));
+        painelBtns.setBackground(TelaBase.COR_BG_MAIN);
+
+        JButton btnEntrar = TelaBase.criarBotaoPrimario("  Entrar  ");
+        btnEntrar.setPreferredSize(new Dimension(145, 38));
         btnEntrar.addActionListener(e -> realizarLogin());
-        
-        btnSair = new JButton("Sair");
-        btnSair.setFont(new Font("Arial", Font.BOLD, 14));
-        btnSair.setBackground(new Color(0, 10,10));
-        btnSair.setForeground(Color.black);
-        btnSair.setFocusPainted(false);
-        btnSair.setPreferredSize(new Dimension(120, 35));
+
+        JButton btnSair = TelaBase.criarBotaoSecundario("  Sair  ");
+        btnSair.setPreferredSize(new Dimension(145, 38));
         btnSair.addActionListener(e -> System.exit(0));
-        
-        painelBotoes.add(btnEntrar);
-        painelBotoes.add(btnSair);
-        
-        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
-  
-        add(painelPrincipal);
-  
+
+        painelBtns.add(btnEntrar);
+        painelBtns.add(btnSair);
+        add(painelBtns, BorderLayout.SOUTH);
+
         txtSenha.addActionListener(e -> realizarLogin());
-
-        JLabel lblInfo = new JLabel("<html><center> </center></html>", SwingConstants.CENTER);
-        lblInfo.setFont(new Font("Arial", Font.PLAIN, 11));
-        lblInfo.setForeground(Color.GRAY);
-        JPanel painelInfo = new JPanel();
-        painelInfo.setBackground(new Color(240, 240, 240));
-        painelInfo.add(lblInfo);
-        painelPrincipal.add(painelInfo, BorderLayout.NORTH);
-        painelPrincipal.add(lblTitulo, BorderLayout.CENTER);
-
-        painelPrincipal.removeAll();
-        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
-        painelPrincipal.add(Box.createVerticalStrut(10));
-        painelPrincipal.add(lblTitulo);
-        painelPrincipal.add(Box.createVerticalStrut(10));
-        painelPrincipal.add(lblInfo);
-        painelPrincipal.add(Box.createVerticalStrut(20));
-        painelPrincipal.add(painelForm);
-        painelPrincipal.add(Box.createVerticalStrut(10));
-        painelPrincipal.add(painelBotoes);
     }
-    
+
     private void realizarLogin() {
         String usuario = txtUsuario.getText();
         String senha = new String(txtSenha.getPassword());
-        
         if (usuario.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Por favor, preencha todos os campos!",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        Usuarios usuarioAutenticado = DadosSistema.getInstancia().autenticarUsuario(usuario, senha);
-        
-        if (usuarioAutenticado != null) {
-            JOptionPane.showMessageDialog(this,
-                "Bem-vindo, " + usuarioAutenticado.getNomeUsuario() + "!",
-                "Login realizado com sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
-
-            SwingUtilities.invokeLater(() -> {
-                new MenuPrincipal(usuarioAutenticado).setVisible(true);
-            });
+        Usuarios u = DadosSistema.getInstancia().autenticarUsuario(usuario, senha);
+        if (u != null) {
+            JOptionPane.showMessageDialog(this, "Bem-vindo, " + u.getNomeUsuario() + "!", "Login", JOptionPane.INFORMATION_MESSAGE);
+            SwingUtilities.invokeLater(() -> new MenuPrincipal(u).setVisible(true));
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this,
-                "Usuário ou senha incorretos!",
-                "Erro de autenticação",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Usuário ou senha incorretos!", "Erro", JOptionPane.ERROR_MESSAGE);
             txtSenha.setText("");
-            txtUsuario.requestFocus();
         }
-    } 
-    
+    }
 }

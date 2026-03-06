@@ -17,8 +17,11 @@
     private String email;
     private String dataCadastro;
     
+    public Alunos() {
+    }
+    
  public Alunos(String nome, String cpf) {
-        this.id = contadorId++;
+        this.id = 0;
         this.nome = nome;
         this.CPF = cpf;
         this.dataCadastro = java.time.LocalDate.now().toString();

@@ -27,7 +27,8 @@
         this(nome, valor, dias);
         this.descricao = descricao;
     }
-
+     public Planos() {
+    }
     public static int getContadorId() {
         return contadorId;
     }
@@ -80,5 +81,6 @@
     public String toString() {
         return nomePlano + " - R$ " + String.format("%.2f", valor) + " (" + duracaoDias + " dias)";
     }  
-    
-}
+   
+ }  
+
